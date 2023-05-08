@@ -32,25 +32,31 @@ def get_top_stories():
 
 @stories_view.route('/top-stories', methods=["GET"])
 def top_stories():
-    cache_key = "top_stories"
-    top_stories = cache.get(cache_key)
-    if not top_stories:
-        top_stories = get_top_stories()
-        top_stories = sorted(top_stories, key=lambda x: x['score'], reverse=True)
-        cache.set(cache_key, top_stories)
-    return jsonify(top_stories)
+    try:
+        cache_key = "top_stories"
+        top_stories = cache.get(cache_key)
+        if not top_stories:
+            top_stories = get_top_stories()
+            top_stories = sorted(top_stories, key=lambda x: x['score'], reverse=True)
+            cache.set(cache_key, top_stories)
+        return jsonify(top_stories)
+    except Exception as e:
+        print("Error : ", e)
 
 @stories_view.route('/past-stories', methods=["GET"])
 def past_stories():
-    cache_key = "past_stories"
-    past_stories = cache.get(cache_key)
-    if not past_stories:
-        past_stories = []
-        top_stories = cache.get("top_stories")
-        if top_stories:
-            past_stories.append(top_stories)
-        else:
-            # Top stories not in cache, fetch them from API
-            past_stories = get_top_stories()
-            cache.set(cache_key, past_stories)
-    return jsonify(past_stories)
+    try:
+        cache_key = "past_stories"
+        past_stories = cache.get(cache_key)
+        if not past_stories:
+            past_stories = []
+            top_stories = cache.get("top_stories")
+            if top_stories:
+                past_stories.append(top_stories)
+            else:
+                # Top stories not in cache, fetch them from API
+                past_stories = get_top_stories()
+                cache.set(cache_key, past_stories)
+        return jsonify(past_stories)
+    except Exception as e:
+        print("Error : ", e)
